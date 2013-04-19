@@ -1,0 +1,32 @@
+{
+	"name": "FidPromise",
+	"version": "1.0.0",
+	"author": "Tyler Akins <fidian@rumkin.com>",
+	"description": "Promise/A+ compatible promises that are written to be easy to read, debuggable, tested and won't break your call stack.",
+	"homepage": "https://github.com/fidian/fid-promise/",
+	"contributors": [
+		"Tyler Akins <fidian@rumkin.com> (http://rumkin.com)"
+	],
+	"main": "./fid-promise.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/fidian/fid-promise.git"
+	},
+	"keywords": [
+		"promise",
+		"a+"
+	],
+	"dependencies": {
+	},
+	"devDependencies": {
+		"promises-aplus-tests": "*"
+	},
+	"license": "MIT",
+	"engines": {
+		"node": ">=0.8",
+		"npm": ">=1"
+	},
+	"scripts": {
+		"test": "node_modules/.bin/promises-aplus-tests test/fid-promise-adapter"
+	}
+}
