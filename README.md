@@ -39,5 +39,19 @@ Usage
         console.log(':-(');
     });
 
+Running Tests
+-------------
+
+Extra modules are needed when you run tests.  You need to have an environment that uses node.js and npm.  From there, you should be able to just run these commands.
+
+    npm update
+	npm test
+
+License
+-------
+
+This package is licensed under the [MIT License] with an additional non-advertising clause.
+
+[MIT License]: LICENSE.md
 [Promise/A+ specification]: https://github.com/promises-aplus/promises-spec
 [UMD]: https://github.com/umdjs/umd
