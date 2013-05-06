@@ -271,10 +271,10 @@
 					if (!myself.waitingFor) {
 						myself.fulfill();
 					}
-				}, function () {
+				}, function (err) {
 					// When any are rejected, immediately reject this promise
 					myself.waitingFor -= 1;
-					myself.reject();
+					myself.reject(err);
 				});
 			}
 		});
