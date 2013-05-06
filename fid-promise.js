@@ -252,9 +252,6 @@
 		args = Array.prototype.slice.call(arguments);
 		myself = this;
 
-		// Avoid triggering too early
-		myself.waitingFor += 1;
-
 		// If an array is passed, then use the first argument only
 		if (Array.isArray(args[0])) {
 			args = args[0];
