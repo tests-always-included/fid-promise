@@ -350,7 +350,7 @@
 			myself.waitingFor += 1;
 
 			if (isThenable(promise)) {
-				myself.debugMessage('(when) Adding then ' + promise.getId());
+				myself.debugMessage('(when) Adding then');
 				promise.debug = true;
 				promise.then(function () {
 					// When all are fulfilled, fulfill this promise
