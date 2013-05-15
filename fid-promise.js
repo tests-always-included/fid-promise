@@ -111,6 +111,7 @@
 
 		myself = this;
 
+		// Use setTimeout to avoid call stack limits
 		setTimeout(function () {
 			var returned;
 
@@ -120,7 +121,7 @@
 			} catch (ex) {
 				myself.chain(thenCall.chainedPromise, false, [ ex ]);
 			}
-		}, 0);
+		}, 0); // Execute immediately
 	};
 
 
