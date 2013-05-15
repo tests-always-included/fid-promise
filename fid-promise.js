@@ -52,6 +52,7 @@
 		this.thenCallArray = [];
 		this.data = [];
 		this.waitingFor = 0;
+		this.debugMessage('New promise');
 
 		if (arguments.length) {
 			this.when.apply(this, arguments);
@@ -103,6 +104,7 @@
 		}
 
 		if (typeof fn !== 'function') {
+			this.debugMessage('CallBack hit non-function');
 			this.chain(thenCall.chainedPromise, this.state, this.data);
 			return;
 		}
@@ -136,8 +138,10 @@
 		// Check if a promise was returned and should be called
 		if (fulfilled && args.length === 1 && isThenable(args[0])) {
 			// Attach this.chainedPromise to this new "thenable"
+			this.debugMessage('Chained to a newly returned promise');
 			this.chainThenable(chainedPromise, args[0]);
 		} else {
+			this.debugMessage('Chaining to next promise');
 			chainedPromise.resolve.call(chainedPromise, fulfilled, args);
 		}
 	};
@@ -163,6 +167,56 @@
 
 
 	/**
+	 * Debugging is built into this promise implementation
+	 *
+	 * Enable it globally:  FidPromise.debug = true;
+	 * Enable it locally:  myPromise.debug = true;
+	 * Use your own logger:  FidPromise.debug = yourLoggerCallback
+
+	 */
+	Promise.prototype.debugMessage = function debugMessage(message) {
+		var debug, fullMessage;
+
+		debug = Promise.debug || this.debug;
+
+		if (debug) {
+			if (!this.id) {
+				this.id = this.getId();
+			}
+
+			fullMessage = this.id + ': ' + message;
+
+			if (typeof debug === 'function') {
+				debug(fullMessage);
+			} else {
+				console.log(fullMessage);
+			}
+		}
+	};
+
+
+	/**
+	 * Create a unique-ish ID.  Does not need to strictly be unique
+	 * but it is certainly helpful if it can be.  Used for debugging.
+	 *
+	 * @return string
+	 */
+	Promise.prototype.getId = function getId() {
+		if (!this.id) {
+			this.id = '';
+
+			while (this.id.length < 10) {
+				this.id += Math.random().toString().substr(2);
+			}
+
+			this.id = this.id.substr(0, 10);
+		}
+
+		return this.id;
+	};
+
+
+	/**
 	 * Change the state and pass along the data to all registered 'then'
 	 * functions.
 	 *
@@ -173,10 +227,18 @@
 		var myself;
 
 		if (this.state !== null) {
+			this.debugMessage('Resolve called twice - ignoring');
 			return;
 		}
 
 		this.state = !!success;  // Force to be a boolean
+
+		if (this.state) {
+			this.debugMessage('Resolved - fulfilled');
+		} else {
+			this.debugMessage('Resolved - rejected');
+		}
+
 		this.data = args;
 		myself = this;
 		this.thenCallArray.forEach(function (thenCall) {
@@ -198,6 +260,7 @@
 	Promise.prototype.then = function then(onFulfilled, onRejected) {
 		var thenCall;
 
+		this.debugMessage('(then) Creating new promise');
 		thenCall = {
 			fulfilled: onFulfilled,
 			rejected: onRejected,
@@ -207,6 +270,7 @@
 		this.thenCallArray.push(thenCall);
 
 		if (this.state !== null) {
+			this.debugMessage('(then) Already resolved: ' + this.state.toString());
 			this.callBack(thenCall);
 		}
 
@@ -261,16 +325,22 @@
 			myself.waitingFor += 1;
 
 			if (isThenable(promise)) {
+				myself.debugMessage('(when) Adding then ' + promise.getId());
+				promise.debug = true;
 				promise.then(function () {
 					// When all are fulfilled, fulfill this promise
 					myself.waitingFor -= 1;
 
 					if (!myself.waitingFor) {
+						myself.debugMessage('(when fulfilled) fulfilled last dependency');
 						myself.fulfill();
+					} else {
+						myself.debugMessage('(when fulfilled) ' + myself.waitingFor + ' left');
 					}
 				}, function (err) {
 					// When any are rejected, immediately reject this promise
 					myself.waitingFor -= 1;
+					myself.debugMessage('(when rejected) ' + myself.waitingFor + ' left');
 					myself.reject(err);
 				});
 			}
@@ -278,6 +348,7 @@
 
 		// Ok, now we can check to see if we are waiting for things
 		if (!myself.waitingFor) {
+			myself.debugMessage('(when) Immediately fulfilled - no dependencies');
 			myself.fulfill();
 		}
 
