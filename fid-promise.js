@@ -361,13 +361,25 @@
 	 */
 
 
+	/**
+	 * On success or failure, run this method.
+	 *
+	 * @return this Not a new promise but instead the original
+	 */
 	Promise.prototype.always = function (fn) {
-		return this.then(fn, fn);
+		this.then(fn, fn);
+		return this;
 	};
 
 
+	/**
+	 * On failure only, run this method.
+	 *
+	 * @return this Not a new promise but instead the original
+	 */
 	Promise.prototype.error = function (fn) {
-		return this.then(null, fn);
+		this.then(null, fn);
+		return this;
 	};
 
 
@@ -381,8 +393,14 @@
 	};
 
 
+	/**
+	 * On success only, run this method.
+	 *
+	 * @return this Not a new promise but instead the original
+	 */
 	Promise.prototype.success = function (fn) {
-		return this.then(fn);
+		this.then(fn);
+		return this;
 	};
 
 
