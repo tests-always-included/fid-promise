@@ -89,6 +89,37 @@
 
 
 	/**
+	 * Accept onFulfilled and onRejected callbacks to our arrays and can
+	 * chain their success/failure to another promise.
+	 *
+	 * @param function|array|null onFulfilled
+	 * @param function|array|null onRejected
+	 * @param undefined|Promise chainedPromise
+	 * @return this
+	 */
+	Promise.prototype.addCallbacks = function then(onFulfilled, onRejected, chainedPromise) {
+		var thenCall;
+
+		this.debugMessage('Adding callbacks');
+
+		thenCall = {
+			fulfilled: onFulfilled,
+			rejected: onRejected,
+			chainedPromise: chainedPromise
+		};
+
+		this.thenCallArray.push(thenCall);
+
+		if (this.state !== null) {
+			this.debugMessage('Already resolved: ' + this.state.toString());
+			this.callBack(thenCall);
+		}
+
+		return this;
+	};
+
+
+	/**
 	 * Call the right function on a thenCall object, passing in this
 	 * promise's data.
 	 *
@@ -132,6 +163,10 @@
 	 * @param array args Pass on to next promise
 	 */
 	Promise.prototype.chain = function chain(chainedPromise, fulfilled, args) {
+		if (!chainedPromise) {
+			return;
+		}
+
 		if (!args) {
 			args = [];
 		}
@@ -259,23 +294,12 @@
 	 * @return Promise
 	 */
 	Promise.prototype.then = function then(onFulfilled, onRejected) {
-		var thenCall;
+		var chainedPromise;
 
 		this.debugMessage('(then) Creating new promise');
-		thenCall = {
-			fulfilled: onFulfilled,
-			rejected: onRejected,
-			chainedPromise: new Promise()
-		};
-
-		this.thenCallArray.push(thenCall);
-
-		if (this.state !== null) {
-			this.debugMessage('(then) Already resolved: ' + this.state.toString());
-			this.callBack(thenCall);
-		}
-
-		return thenCall.chainedPromise;
+		chainedPromise = new Promise();
+		this.addCallbacks(onFulfilled, onRejected, chainedPromise);
+		return chainedPromise;
 	};
 
 
@@ -368,8 +392,7 @@
 	 * @return this Not a new promise but instead the original
 	 */
 	Promise.prototype.always = function (fn) {
-		this.then(fn, fn);
-		return this;
+		return this.addCallbacks(fn, fn);
 	};
 
 
@@ -379,8 +402,7 @@
 	 * @return this Not a new promise but instead the original
 	 */
 	Promise.prototype.error = function (fn) {
-		this.then(null, fn);
-		return this;
+		return this.addCallbacks(null, fn);
 	};
 
 
@@ -400,8 +422,7 @@
 	 * @return this Not a new promise but instead the original
 	 */
 	Promise.prototype.success = function (fn) {
-		this.then(fn);
-		return this;
+		return this.addCallbacks(fn);
 	};
 
 
