@@ -11,7 +11,7 @@ Goals
 3. Testable.  *All code should be tested.*
 4. Simple.  *Extra functionality often makes bugs or the code will become brittle.*
 5. Avoid blowing up a call stack.
-6. Use it everywhere
+6. Use it everywhere.  *Browser, node, with YUI, RequireJS and more.*
 
 That last goal just means that everything runs with its own timeout, so one can not possibly break the code by accidentally chaining a lot of promises together.  If they are all synchronous and fulfill themselves immediately other libraries may recurse too deeply and cause the code to fail.  It's a tiny bit slower, but I'd take reliability over extreme speed.
 
