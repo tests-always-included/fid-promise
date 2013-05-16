@@ -1,11 +1,13 @@
 // Tests Promise against the Promises/A+ Test Suite
 // https://github.com/promises-aplus/promises-tests
+/*global describe*/
 
 'use strict';
 
-var Promise = require('../fid-promise');
+var adapter, Promise;
 
-module.exports = {
+Promise = require('../fid-promise');
+adapter = {
 	pending: function () {
 		var p = new Promise();
 		return {
@@ -19,3 +21,7 @@ module.exports = {
 		};
 	}
 };
+
+describe('Promises/A+ Tests', function () {
+	require('promises-aplus-tests').mocha(adapter);
+});
