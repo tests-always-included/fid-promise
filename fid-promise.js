@@ -386,6 +386,29 @@
 
 
 	/**
+	 * Easy way to call the constructor
+	 *
+	 * Old:  var promise = new FidPromise([things]);
+	 *       promise.then(...);
+	 *
+	 * New:  FidPromise.create([things]).then(...);
+	 *
+	 * @param mixed (see constructor)
+	 */
+	Promise.create = function () {
+		var promise;
+
+		promise = new Promise();
+
+		if (arguments.length) {
+			promise.when.apply(promise, arguments);
+		}
+
+		return promise;
+	};
+
+
+	/**
 	 * On success or failure, run this method.
 	 *
 	 * @return this Not a new promise but instead the original
