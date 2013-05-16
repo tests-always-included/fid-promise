@@ -418,7 +418,7 @@
 		// Ok, now we can check to see if we are waiting for things
 		if (!myself.waitingFor) {
 			myself.debugMessage('(when) Immediately resolved - no dependencies');
-			myself.fulfill();
+			myself.resolve();
 		}
 
 		return this;
