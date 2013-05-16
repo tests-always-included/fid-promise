@@ -7,7 +7,7 @@
  * Usage:
  *   function somethingAsync() {
  *       promise = new Promise();
- *       // Do something async and that will call promise.fulfill(data) on
+ *       // Do something async and that will call promise.resolve(data) on
  *       // success, promise.reject(error) on failure
  *       return promise;
  *   }
@@ -47,7 +47,7 @@
 			return new Promise();
 		}
 
-		// null = pending, true = fulfilled, false = rejected
+		// null = pending, true = resolved, false = rejected
 		this.state = null;
 		this.thenCallArray = [];
 		this.data = [];
@@ -89,22 +89,22 @@
 
 
 	/**
-	 * Accept onFulfilled and onRejected callbacks to our arrays and can
+	 * Accept onSuccess and onFailure callbacks to our arrays and can
 	 * chain their success/failure to another promise.
 	 *
-	 * @param function|array|null onFulfilled
-	 * @param function|array|null onRejected
+	 * @param function|array|null onSuccess
+	 * @param function|array|null onError
 	 * @param undefined|Promise chainedPromise
 	 * @return this
 	 */
-	Promise.prototype.addCallbacks = function then(onFulfilled, onRejected, chainedPromise) {
+	Promise.prototype.addCallbacks = function then(onSuccess, onError, chainedPromise) {
 		var thenCall;
 
 		this.debugMessage('Adding callbacks');
 
 		thenCall = {
-			fulfilled: onFulfilled,
-			rejected: onRejected,
+			onSuccess: onSuccess,
+			onError: onError,
 			chainedPromise: chainedPromise
 		};
 
@@ -129,9 +129,9 @@
 		var fn, myself;
 
 		if (this.state) {
-			fn = thenCall.fulfilled;
+			fn = thenCall.onSuccess;
 		} else {
-			fn = thenCall.rejected;
+			fn = thenCall.onError;
 		}
 
 		if (typeof fn !== 'function') {
@@ -157,12 +157,12 @@
 
 
 	/**
-	 * Chain a fulfillment/rejection to the next promise
+	 * Chain a success/error to the next promise
 	 *
-	 * @param boolean fulfilled true/false
+	 * @param boolean wasSuccess true/false
 	 * @param array args Pass on to next promise
 	 */
-	Promise.prototype.chain = function chain(chainedPromise, fulfilled, args) {
+	Promise.prototype.chain = function chain(chainedPromise, wasSuccess, args) {
 		if (!chainedPromise) {
 			return;
 		}
@@ -172,13 +172,13 @@
 		}
 
 		// Check if a promise was returned and should be called
-		if (fulfilled && args.length === 1 && isThenable(args[0])) {
+		if (wasSuccess && args.length === 1 && isThenable(args[0])) {
 			// Attach this.chainedPromise to this new "thenable"
 			this.debugMessage('Chained to a newly returned promise');
 			this.chainThenable(chainedPromise, args[0]);
 		} else {
 			this.debugMessage('Chaining to next promise');
-			chainedPromise.resolve.call(chainedPromise, fulfilled, args);
+			chainedPromise.complete(wasSuccess, args);
 		}
 	};
 
@@ -192,12 +192,12 @@
 		try {
 			// Pass all arguments to the next promise
 			thenable.then(function () {
-				chainedPromise.resolve(true, arguments);
+				chainedPromise.complete(true, arguments);
 			}, function () {
-				chainedPromise.resolve(false, arguments);
+				chainedPromise.complete(false, arguments);
 			});
 		} catch (ex) {
-			chainedPromise.resolve(false, [ ex ]);
+			chainedPromise.complete(false, [ ex ]);
 		}
 	};
 
@@ -256,23 +256,23 @@
 	 * Change the state and pass along the data to all registered 'then'
 	 * functions.
 	 *
-	 * @param boolean success true if fulfilled, false if rejected
+	 * @param boolean wasSuccess true if successful, false if error
 	 * @param array args Additional arguments to pass on
 	 */
-	Promise.prototype.resolve = function resolve(success, args) {
+	Promise.prototype.complete = function (wasSuccess, args) {
 		var myself;
 
 		if (this.state !== null) {
-			this.debugMessage('Resolve called twice - ignoring');
+			this.debugMessage('Complete called twice - ignoring');
 			return;
 		}
 
-		this.state = !!success;  // Force to be a boolean
+		this.state = !!wasSuccess;  // Force to be a boolean
 
 		if (this.state) {
-			this.debugMessage('Resolved - fulfilled');
+			this.debugMessage('Complete - success');
 		} else {
-			this.debugMessage('Resolved - rejected');
+			this.debugMessage('Complete - error');
 		}
 
 		this.data = args;
@@ -286,51 +286,54 @@
 
 
 	/**
-	 * Accept onFulfilled and onRejected callbacks.  Adds them to our
+	 * Accept onSuccess and onError callbacks.  Adds them to our
 	 * arrays and will return a new Promise.
 	 *
-	 * @param function|array|null onFulfilled
-	 * @param function|array|null onRejected
+	 * @param mixed onSuccess
+	 * @param mixed onError
 	 * @return Promise
 	 */
-	Promise.prototype.then = function then(onFulfilled, onRejected) {
+	Promise.prototype.then = function then(onSuccess, onError) {
 		var chainedPromise;
 
 		this.debugMessage('(then) Creating new promise');
 		chainedPromise = new Promise();
-		this.addCallbacks(onFulfilled, onRejected, chainedPromise);
+		this.addCallbacks(onSuccess, onError, chainedPromise);
 		return chainedPromise;
 	};
 
 
 	/**
-	 * Become fulfilled only when everything is resolved.  You can call
+	 * Become resolved only when everything is resolved.  You can call
 	 * this multiple times in a row on the same promise to chain several
-	 * together, but that introduces risk if the first one is fulfilled
-	 * already.
+	 * together, but that introduces risk if the first one is resolved
+	 * already.  Becomes rejected as soon as any is rejected.
 	 *
-	 * // Fulfilled or reject when promise2 is fulfilled or rejected
-	 * Promise.when(promise2);
-	 * // Add promise 3 to Promise
-	 * Promise.when(promise3);
+	 * // Resolve or reject when promise2 is resolved or rejected
+	 * var myPromise = new Promise();
+	 * myPromise.when(promise2);
+	 * // Add promise 3 to myPromise
+	 * myPromise.when(promise3);
 	 * // Add two more
-	 * Promise.when(promise4, promise5);
+	 * myPromise.when(promise4, promise5);
 	 * // And two more with an array
-	 * Promise.when([promise6, promise7]);
+	 * myPromise.when([promise6, promise7]);
 	 *
 	 * This lets you build a list of promises easily in two different ways.
+	 * For these examples, assume the callbacks return promises.
 	 *
-	 * // Way #1
+	 * // Way #1 - avoid, but this can work
+	 * // Can resolve immediately if the first resolves immediately
 	 * [ callback1, callback2, callback3 ].forEach(function (cb) {
-	 *     Promise.when(cb());
+	 *     myPromise.when(cb());
 	 * });
 	 *
-	 * // Way #2 (safer)
+	 * // Way #2 - safer because it only can resolve after all
 	 * promises = [];
 	 * [ callback1, callback2, callback3 ].forEach(function (cb) {
 	 *     promises.push(cb());
 	 * });
-	 * Promise.when(promises);
+	 * myPromise.when(promises);
 	 *
 	 * @param Promise|Array
 	 * @return this
@@ -352,14 +355,14 @@
 			if (isThenable(promise)) {
 				myself.debugMessage('(when) Adding then');
 				promise.then(function () {
-					// When all are fulfilled, fulfill this promise
+					// When all are resolved, resolve this promise
 					myself.waitingFor -= 1;
 
 					if (!myself.waitingFor) {
-						myself.debugMessage('(when fulfilled) fulfilled last dependency');
-						myself.fulfill();
+						myself.debugMessage('(when resolved) resolved last dependency');
+						myself.resolve();
 					} else {
-						myself.debugMessage('(when fulfilled) ' + myself.waitingFor + ' left');
+						myself.debugMessage('(when resolved) ' + myself.waitingFor + ' left');
 					}
 				}, function (err) {
 					// When any are rejected, immediately reject this promise
@@ -372,7 +375,7 @@
 
 		// Ok, now we can check to see if we are waiting for things
 		if (!myself.waitingFor) {
-			myself.debugMessage('(when) Immediately fulfilled - no dependencies');
+			myself.debugMessage('(when) Immediately resolved - no dependencies');
 			myself.fulfill();
 		}
 
@@ -386,16 +389,17 @@
 
 
 	/**
-	 * Easy way to call the constructor
+	 * Easy way to chain functionality to multiple promises into a
+	 * single promise.
 	 *
-	 * Old:  var promise = new FidPromise([things]);
+	 * Old:  var promise = new FidPromise([other, promises, go, here]);
 	 *       promise.then(...);
 	 *
-	 * New:  FidPromise.create([things]).then(...);
+	 * New:  FidPromise.when([other, promises, go, here]).then(...);
 	 *
 	 * @param mixed (see constructor)
 	 */
-	Promise.create = function () {
+	Promise.when = function () {
 		var promise;
 
 		promise = new Promise();
@@ -428,13 +432,13 @@
 	};
 
 
-	Promise.prototype.fulfill = function () {
-		return this.resolve(true, arguments);
+	Promise.prototype.resolve = function () {
+		return this.complete(true, arguments);
 	};
 
 
 	Promise.prototype.reject = function () {
-		return this.resolve(false, arguments);
+		return this.complete(false, arguments);
 	};
 
 

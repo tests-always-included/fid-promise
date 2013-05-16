@@ -11,7 +11,7 @@ module.exports = {
 		return {
 			promise: p,
 			fulfill: function (value) {
-				p.fulfill(value);
+				p.resolve(value);
 			},
 			reject: function (reason) {
 				p.reject(reason);
