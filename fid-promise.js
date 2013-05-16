@@ -40,6 +40,24 @@
 
 
 	/**
+	 * Determines if something is "thenable" according to A+ spec
+	 *
+	 * @param mixed target
+	 * @return boolean True if it's thenable
+	 */
+	function isThenable(target) {
+		try {
+			if (typeof target.then === 'function') {
+				return true;
+			}
+		} catch (ex) {
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * Create a new Promise
 	 */
 	function Promise() {
@@ -61,34 +79,6 @@
 
 
 	/**
-	 * UTILITY FUNCTIONS
-	 */
-
-
-	/**
-	 * Determines if something is "thenable" according to A+ spec
-	 *
-	 * @param mixed target
-	 * @return boolean True if it's thenable
-	 */
-	function isThenable(target) {
-		try {
-			if (typeof target.then === 'function') {
-				return true;
-			}
-		} catch (ex) {
-		}
-
-		return false;
-	}
-
-
-	/**
-	 * PROTOTYPE
-	 */
-
-
-	/**
 	 * Accept onSuccess and onFailure callbacks to our arrays and can
 	 * chain their success/failure to another promise.
 	 *
@@ -97,7 +87,7 @@
 	 * @param undefined|Promise chainedPromise
 	 * @return this
 	 */
-	Promise.prototype.addCallbacks = function then(onSuccess, onError, chainedPromise) {
+	Promise.prototype.addCallbacks = function (onSuccess, onError, chainedPromise) {
 		var thenCall;
 
 		this.debugMessage('Adding callbacks');
@@ -116,6 +106,16 @@
 		}
 
 		return this;
+	};
+
+
+	/**
+	 * On success or failure, run this method.
+	 *
+	 * @return this Not a new promise but instead the original
+	 */
+	Promise.prototype.always = function (fn) {
+		return this.addCallbacks(fn, fn);
 	};
 
 
@@ -162,7 +162,7 @@
 	 * @param boolean wasSuccess true/false
 	 * @param array args Pass on to next promise
 	 */
-	Promise.prototype.chain = function chain(chainedPromise, wasSuccess, args) {
+	Promise.prototype.chain = function (chainedPromise, wasSuccess, args) {
 		if (!chainedPromise) {
 			return;
 		}
@@ -188,7 +188,7 @@
 	 *
 	 * @param function|object thenable
 	 */
-	Promise.prototype.chainThenable = function chainThenable(chainedPromise, thenable) {
+	Promise.prototype.chainThenable = function (chainedPromise, thenable) {
 		try {
 			// Pass all arguments to the next promise
 			thenable.then(function () {
@@ -203,68 +203,19 @@
 
 
 	/**
-	 * Debugging is built into this promise implementation
-	 *
-	 * Enable it globally:  FidPromise.debug = true;
-	 * Enable it locally:  myPromise.debug = true;
-	 * Use your own logger:  FidPromise.debug = yourLoggerCallback
-
-	 */
-	Promise.prototype.debugMessage = function debugMessage(message) {
-		var debug, fullMessage;
-
-		debug = Promise.debug || this.debug;
-
-		if (debug) {
-			if (!this.id) {
-				this.id = this.getId();
-			}
-
-			fullMessage = this.id + ': ' + message;
-
-			if (typeof debug === 'function') {
-				debug(fullMessage);
-			} else {
-				console.log(fullMessage);
-			}
-		}
-	};
-
-
-	/**
-	 * Create a unique-ish ID.  Does not need to strictly be unique
-	 * but it is certainly helpful if it can be.  Used for debugging.
-	 *
-	 * @return string
-	 */
-	Promise.prototype.getId = function getId() {
-		if (!this.id) {
-			this.id = '';
-
-			while (this.id.length < 10) {
-				this.id += Math.random().toString().substr(2);
-			}
-
-			this.id = this.id.substr(0, 10);
-		}
-
-		return this.id;
-	};
-
-
-	/**
 	 * Change the state and pass along the data to all registered 'then'
 	 * functions.
 	 *
 	 * @param boolean wasSuccess true if successful, false if error
 	 * @param array args Additional arguments to pass on
+	 * @return this
 	 */
 	Promise.prototype.complete = function (wasSuccess, args) {
 		var myself;
 
 		if (this.state !== null) {
 			this.debugMessage('Complete called twice - ignoring');
-			return;
+			return this;
 		}
 
 		this.state = !!wasSuccess;  // Force to be a boolean
@@ -286,6 +237,97 @@
 
 
 	/**
+	 * Debugging is built into this promise implementation
+	 *
+	 * Enable it globally:  FidPromise.debug = true;
+	 * Enable it locally:  myPromise.debug = true;
+	 * Use your own logger:  FidPromise.debug = yourLoggerCallback
+	 */
+	Promise.prototype.debugMessage = function (message) {
+		var debug, fullMessage;
+
+		debug = Promise.debug || this.debug;
+
+		if (debug) {
+			if (!this.id) {
+				this.id = this.getId();
+			}
+
+			fullMessage = this.id + ': ' + message;
+
+			if (typeof debug === 'function') {
+				debug(fullMessage);
+			} else {
+				console.log(fullMessage);
+			}
+		}
+	};
+
+
+	/**
+	 * On failure only, run this method.
+	 *
+	 * @return this Not a new promise but instead the original
+	 */
+	Promise.prototype.error = function (fn) {
+		return this.addCallbacks(null, fn);
+	};
+
+
+	/**
+	 * Create a unique-ish ID.  Does not need to strictly be unique
+	 * but it is certainly helpful if it can be.  Used for debugging.
+	 *
+	 * @return string
+	 */
+	Promise.prototype.getId = function () {
+		if (!this.id) {
+			this.id = '';
+
+			while (this.id.length < 10) {
+				this.id += Math.random().toString().substr(2);
+			}
+
+			this.id = this.id.substr(0, 10);
+		}
+
+		return this.id;
+	};
+
+
+	/**
+	 * Mark a promise as rejected.  Passes arguments to onError callbacks
+	 * registered with .then()
+	 *
+	 * @return this
+	 */
+	Promise.prototype.reject = function () {
+		return this.complete(false, arguments);
+	};
+
+
+	/**
+	 * Mark a promise as successfully completed.  Passes arguments
+	 * to onSuccess callbacks registered with .then()
+	 *
+	 * @return this
+	 */
+	Promise.prototype.resolve = function () {
+		return this.complete(true, arguments);
+	};
+
+
+	/**
+	 * On success only, run this method.
+	 *
+	 * @return this Not a new promise but instead the original
+	 */
+	Promise.prototype.success = function (fn) {
+		return this.addCallbacks(fn);
+	};
+
+
+	/**
 	 * Accept onSuccess and onError callbacks.  Adds them to our
 	 * arrays and will return a new Promise.
 	 *
@@ -293,7 +335,7 @@
 	 * @param mixed onError
 	 * @return Promise
 	 */
-	Promise.prototype.then = function then(onSuccess, onError) {
+	Promise.prototype.then = function (onSuccess, onError) {
 		var chainedPromise;
 
 		this.debugMessage('(then) Creating new promise');
@@ -338,7 +380,7 @@
 	 * @param Promise|Array
 	 * @return this
 	 */
-	Promise.prototype.when = function when() {
+	Promise.prototype.when = function () {
 		var args, myself;
 
 		args = Array.prototype.slice.call(arguments);
@@ -384,13 +426,8 @@
 
 
 	/**
-	 * SUGAR
-	 */
-
-
-	/**
-	 * Easy way to chain functionality to multiple promises into a
-	 * single promise.
+	 * Easy way to make a new promise based on the completion of other
+	 * promises.
 	 *
 	 * Old:  var promise = new FidPromise([other, promises, go, here]);
 	 *       promise.then(...);
@@ -409,46 +446,6 @@
 		}
 
 		return promise;
-	};
-
-
-	/**
-	 * On success or failure, run this method.
-	 *
-	 * @return this Not a new promise but instead the original
-	 */
-	Promise.prototype.always = function (fn) {
-		return this.addCallbacks(fn, fn);
-	};
-
-
-	/**
-	 * On failure only, run this method.
-	 *
-	 * @return this Not a new promise but instead the original
-	 */
-	Promise.prototype.error = function (fn) {
-		return this.addCallbacks(null, fn);
-	};
-
-
-	Promise.prototype.resolve = function () {
-		return this.complete(true, arguments);
-	};
-
-
-	Promise.prototype.reject = function () {
-		return this.complete(false, arguments);
-	};
-
-
-	/**
-	 * On success only, run this method.
-	 *
-	 * @return this Not a new promise but instead the original
-	 */
-	Promise.prototype.success = function (fn) {
-		return this.addCallbacks(fn);
 	};
 
 
