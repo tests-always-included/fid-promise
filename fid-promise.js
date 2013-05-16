@@ -112,7 +112,7 @@
 	/**
 	 * On success or failure, run this method.
 	 *
-	 * @return this Not a new promise but instead the original
+	 * @return this
 	 */
 	Promise.prototype.always = function (fn) {
 		return this.addCallbacks(fn, fn);
