@@ -34,7 +34,7 @@ Quick Usage
         promise = new Promise();
         
         // Do something async and that will call promise.resolve(data) on
-        // success, promise.resolve(error) on failure
+        // success, promise.reject(error) on failure
         return promise;
     }
     
