@@ -31,7 +31,7 @@ Quick Usage
 -----------
 
     function somethingAsync() {
-        promise = new Promise();
+        promise = new FidPromise();
         
         // Do something async and that will call promise.resolve(data) on
         // success, promise.reject(error) on failure
@@ -49,9 +49,9 @@ Public API
 
 Here's the functions that are intended to be used by outsiders.  You're welcome to dig into the source in order to poke around at the rest, but that's hopefully unnecessary.
 
-For the below, `Promise` refers to the constructor function and `promise` refers to an instance.
+For the below, `FidPromise` refers to the constructor function and `promise` refers to an instance.
 
-### `Promise()` constructor
+### `FidPromise()` constructor
 
 Returns a new `FidPromise`.
 
@@ -65,9 +65,9 @@ Returns `promise`.
 
 Attach a callback to both the list of success and error callbacks.  The callback should always be called when the promise is completed.  Returns `promise`.
 
-### `Promise.debug` and `promise.debug`
+### `FidPromise.debug` and `promise.debug`
 
-If either are defined and are truthy, then debug messages will start being sent to the console.  If `Promise.debug` is truthy then all promises will get debugged and `promise.debug` will debug just a single promise.
+If either are defined and are truthy, then debug messages will start being sent to the console.  If `FidPromise.debug` is truthy then all promises will get debugged and `promise.debug` will debug just a single promise.
 
 You can also set `.debug` to a callback that will be passed a single string parameter if you wish to implement your own logging mechanism.
 
@@ -93,7 +93,7 @@ Attach callbacks to the success and error callback lists.
 
 Both `onSuccess` and `onError` may be omitted or `null` for no callbacks, a function, or an array of functions.
 
-This always returns *a new Promise* object.
+This always returns *a new FidPromise* object.
 
 ### `promise.when(arrayOfPromises)`
 
@@ -101,7 +101,11 @@ Waits for every promise in the array to be resolved or until the first rejected 
 
 Returns `promise`.
 
-### `Promise.when(arrayOfPromises)` and `Promise.when(anotherPromise)`
+### `FidPromise.after(arrayOfPromises)`
+
+Creates a new promise and calls `promise.after()` on it, passing in your arguments.  Returns the new promise.  This saves you from potentially creating another local variable and could produce cleaner looking code.
+
+### `FidPromise.when(arrayOfPromises)`
 
 Creates a new promise and calls `promise.when()` on it, passing in your arguments.  Returns the new promise.  This saves you from potentially creating another local variable and could produce cleaner looking code.
 
