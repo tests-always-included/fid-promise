@@ -51,9 +51,15 @@ Here's the functions that are intended to be used by outsiders.  You're welcome 
 
 For the below, `Promise` refers to the constructor function and `promise` refers to an instance.
 
-### `Promise([array])` constructor
+### `Promise()` constructor
 
-Returns a new `FidPromise`.  If passed arguments, those are passed to `.when()`.
+Returns a new `FidPromise`.
+
+### `promise.after(arrayOfPromises)`
+
+Waits for every promise in the array to be completed.  Once they are, this promise will be rejected or resolved.  If rejected, the passed data will be an array of all of the rejections.  If resolved properly, the passed data will be an array of all of the resolutions.  This is similar to `when()` except that this will reject the promise only after everything is done instead of on the first error.
+
+Returns `promise`.
 
 ### `promise.always(callback)`
 
@@ -89,11 +95,9 @@ Both `onSuccess` and `onError` may be omitted or `null` for no callbacks, a func
 
 This always returns *a new Promise* object.
 
-### `promise.when(arrayOfPromises)` and `promise.when(anotherPromise)`
+### `promise.when(arrayOfPromises)`
 
-Add `anotherPromise` or each of the promises in `arrayOfPromises` to the list of dependencies.  Fail when any of them are rejected, or succeed when all of them are fulfilled.
-
-It is strongly suggested that you collect your promises into an array and pass that array at once.  This will avoid potential problems where you pass nothing or passing a resolved promise, which would instantly resolve `promise` and probably altering the flow of your program.
+Waits for every promise in the array to be resolved or until the first rejected promise.  If rejected, the promise will be immediately rejected with the data passed from the other rejected promise.  If resolved properly, the passed data will be an array of all of the resolutions.  This is the same as `after()` but this version does not wait for all of the promises to resolve if any hit an error condition.
 
 Returns `promise`.
 
@@ -108,6 +112,18 @@ Extra modules are needed when you run tests.  You need to have an environment th
 
     npm update
 	npm test
+
+Changelog
+---------
+
+Not all minor changes are listed here.  Just the important ones that affect how you'd use this object.
+
+2013-05-30:
+
+ * Constructor now does not take any parameter.  Use `FidPromise.when()` instead.
+ * `when()` will return an array of the results from the promises that are fulfilled.
+ * `when()` now only accepts an array for a parameter.
+ * Added `.after()` method and `FidPromise.after()` helper function.
 
 License
 -------

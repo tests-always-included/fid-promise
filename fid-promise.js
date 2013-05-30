@@ -6,7 +6,7 @@
  *
  * Usage:
  *   function somethingAsync() {
- *       promise = new Promise();
+ *       promise = new FidPromise();
  *       // Do something async and that will call promise.resolve(data) on
  *       // success, promise.reject(error) on failure
  *       return promise;
@@ -58,23 +58,18 @@
 
 
 	/**
-	 * Create a new Promise
+	 * Create a new FidPromise
 	 */
-	function Promise() {
-		if (!(this instanceof Promise)) {
-			return new Promise();
+	function FidPromise() {
+		if (!(this instanceof FidPromise)) {
+			return new FidPromise();
 		}
 
 		// null = pending, true = resolved, false = rejected
+		this.data = [];
+		this.debugMessage('New promise');
 		this.state = null;
 		this.thenCallArray = [];
-		this.data = [];
-		this.waitingFor = 0;
-		this.debugMessage('New promise');
-
-		if (arguments.length) {
-			this.when.apply(this, arguments);
-		}
 	}
 
 
@@ -84,10 +79,10 @@
 	 *
 	 * @param function|array|null onSuccess
 	 * @param function|array|null onError
-	 * @param undefined|Promise chainedPromise
+	 * @param undefined|FidPromise chainedPromise
 	 * @return this
 	 */
-	Promise.prototype.addCallbacks = function (onSuccess, onError, chainedPromise) {
+	FidPromise.prototype.addCallbacks = function (onSuccess, onError, chainedPromise) {
 		var thenCall;
 
 		this.debugMessage('Adding callbacks');
@@ -110,11 +105,71 @@
 
 
 	/**
+	 * Resolve or reject only after every other promise is resolved or
+	 * rejected.  Like the when() method, but rejections are held back
+	 * until all promises are done and then only the first rejection is
+	 * sent via a rejection.  See when() for more details.
+	 *
+	 * @param Array promises
+	 * @return this
+	 */
+	FidPromise.prototype.after = function (promises) {
+		var args, endSuccess, failResults, myself, successResults, waitingFor;
+
+		args = Array.prototype.slice.call(arguments);
+		waitingFor = 0;
+		endSuccess = true;
+		successResults = [];
+		failResults = [];
+		myself = this;
+
+		function checkCount() {
+			if (waitingFor === 0) {
+				myself.debugMessage('(after) Final error count ' + failResults.length);
+
+				if (endSuccess) {
+					myself.resolve(successResults);
+				} else {
+					myself.reject(failResults);
+				}
+			}
+		}
+
+		promises.forEach(function (promise) {
+			if (isThenable(promise)) {
+				waitingFor += 1;
+				myself.debugMessage('(after) Adding then');
+				promise.then(function (result) {
+					waitingFor -= 1;
+
+					if (result !== undefined) {
+						successResults.push(result);
+					}
+
+					myself.debugMessage('(after resolved) ' + waitingFor + ' left');
+					checkCount();
+				}, function (result) {
+					waitingFor -= 1;
+					failResults.push(result);
+					endSuccess = false;
+					myself.debugMessage('(after rejected) ' + waitingFor + ' left');
+					checkCount();
+				});
+			}
+		});
+
+		// Ok, now we can check to see if we are waiting for things
+		checkCount();
+		return this;
+	};
+
+
+	/**
 	 * On success or failure, run this method.
 	 *
 	 * @return this
 	 */
-	Promise.prototype.always = function (fn) {
+	FidPromise.prototype.always = function (fn) {
 		return this.addCallbacks(fn, fn);
 	};
 
@@ -125,7 +180,7 @@
 	 *
 	 * @parameter object thenCall
 	 */
-	Promise.prototype.callBack = function (thenCall) {
+	FidPromise.prototype.callBack = function (thenCall) {
 		var fn, myself;
 
 		if (this.state) {
@@ -162,7 +217,7 @@
 	 * @param boolean wasSuccess true/false
 	 * @param array args Pass on to next promise
 	 */
-	Promise.prototype.chain = function (chainedPromise, wasSuccess, args) {
+	FidPromise.prototype.chain = function (chainedPromise, wasSuccess, args) {
 		if (!chainedPromise) {
 			return;
 		}
@@ -188,7 +243,7 @@
 	 *
 	 * @param function|object thenable
 	 */
-	Promise.prototype.chainThenable = function (chainedPromise, thenable) {
+	FidPromise.prototype.chainThenable = function (chainedPromise, thenable) {
 		try {
 			// Pass all arguments to the next promise
 			thenable.then(function () {
@@ -210,7 +265,7 @@
 	 * @param array args Additional arguments to pass on
 	 * @return this
 	 */
-	Promise.prototype.complete = function (wasSuccess, args) {
+	FidPromise.prototype.complete = function (wasSuccess, args) {
 		var myself;
 
 		if (this.state !== null) {
@@ -243,10 +298,10 @@
 	 * Enable it locally:  myPromise.debug = true;
 	 * Use your own logger:  FidPromise.debug = yourLoggerCallback
 	 */
-	Promise.prototype.debugMessage = function (message) {
+	FidPromise.prototype.debugMessage = function (message) {
 		var debug, fullMessage;
 
-		debug = Promise.debug || this.debug;
+		debug = FidPromise.debug || this.debug;
 
 		if (debug) {
 			if (!this.id) {
@@ -269,7 +324,7 @@
 	 *
 	 * @return this Not a new promise but instead the original
 	 */
-	Promise.prototype.error = function (fn) {
+	FidPromise.prototype.error = function (fn) {
 		return this.addCallbacks(null, fn);
 	};
 
@@ -280,7 +335,7 @@
 	 *
 	 * @return string
 	 */
-	Promise.prototype.getId = function () {
+	FidPromise.prototype.getId = function () {
 		if (!this.id) {
 			this.id = '';
 
@@ -301,7 +356,7 @@
 	 *
 	 * @return this
 	 */
-	Promise.prototype.reject = function () {
+	FidPromise.prototype.reject = function () {
 		return this.complete(false, arguments);
 	};
 
@@ -312,7 +367,7 @@
 	 *
 	 * @return this
 	 */
-	Promise.prototype.resolve = function () {
+	FidPromise.prototype.resolve = function () {
 		return this.complete(true, arguments);
 	};
 
@@ -322,103 +377,82 @@
 	 *
 	 * @return this Not a new promise but instead the original
 	 */
-	Promise.prototype.success = function (fn) {
+	FidPromise.prototype.success = function (fn) {
 		return this.addCallbacks(fn);
 	};
 
 
 	/**
 	 * Accept onSuccess and onError callbacks.  Adds them to our
-	 * arrays and will return a new Promise.
+	 * arrays and will return a new FidPromise.
 	 *
 	 * @param mixed onSuccess
 	 * @param mixed onError
-	 * @return Promise
+	 * @return FidPromise
 	 */
-	Promise.prototype.then = function (onSuccess, onError) {
+	FidPromise.prototype.then = function (onSuccess, onError) {
 		var chainedPromise;
 
 		this.debugMessage('(then) Creating new promise');
-		chainedPromise = new Promise();
+		chainedPromise = new FidPromise();
 		this.addCallbacks(onSuccess, onError, chainedPromise);
 		return chainedPromise;
 	};
 
 
 	/**
-	 * Become resolved only when everything is resolved.  You can call
-	 * this multiple times in a row on the same promise to chain several
-	 * together, but that introduces risk if the first one is resolved
-	 * already.  Becomes rejected as soon as any is rejected.
+	 * Become resolved only when everything is resolved, but will be
+	 * rejected as soon as any promise is rejected.  Very similar to
+	 * after().
 	 *
-	 * // Resolve or reject when promise2 is resolved or rejected
-	 * var myPromise = new Promise();
-	 * myPromise.when(promise2);
-	 * // Add promise 3 to myPromise
-	 * myPromise.when(promise3);
-	 * // Add two more
-	 * myPromise.when(promise4, promise5);
-	 * // And two more with an array
-	 * myPromise.when([promise6, promise7]);
-	 *
-	 * This lets you build a list of promises easily in two different ways.
-	 * For these examples, assume the callbacks return promises.
-	 *
-	 * // Way #1 - avoid, but this can work
-	 * // Can resolve immediately if the first resolves immediately
-	 * [ callback1, callback2, callback3 ].forEach(function (cb) {
-	 *     myPromise.when(cb());
-	 * });
-	 *
-	 * // Way #2 - safer because it only can resolve after all
-	 * promises = [];
-	 * [ callback1, callback2, callback3 ].forEach(function (cb) {
-	 *     promises.push(cb());
+	 * // Resolve once all of the promises are resolved
+	 * promises = [ callback1, callback2, callback3 ].map(function (cb) {
+	 *     // Your callback returns a promise
+	 *     return cb();
 	 * });
 	 * myPromise.when(promises);
 	 *
-	 * @param Promise|Array
+	 * @param Array promises
 	 * @return this
 	 */
-	Promise.prototype.when = function () {
-		var args, myself;
+	FidPromise.prototype.when = function (promises) {
+		var args, myself, successResults, waitingFor;
 
-		args = Array.prototype.slice.call(arguments);
+		waitingFor = 0;
+		successResults = [];
 		myself = this;
 
-		// If an array is passed, then use the first argument only
-		if (Array.isArray(args[0])) {
-			args = args[0];
-		}
-
-		args.forEach(function (promise) {
-			myself.waitingFor += 1;
-
+		promises.forEach(function (promise) {
 			if (isThenable(promise)) {
+				waitingFor += 1;
 				myself.debugMessage('(when) Adding then');
-				promise.then(function () {
+				promise.then(function (result) {
 					// When all are resolved, resolve this promise
-					myself.waitingFor -= 1;
+					waitingFor -= 1;
 
-					if (!myself.waitingFor) {
+					if (result !== undefined) {
+						successResults.push(result);
+					}
+
+					if (!waitingFor) {
 						myself.debugMessage('(when resolved) resolved last dependency');
-						myself.resolve();
+						myself.resolve(successResults);
 					} else {
-						myself.debugMessage('(when resolved) ' + myself.waitingFor + ' left');
+						myself.debugMessage('(when resolved) ' + waitingFor + ' left');
 					}
 				}, function (err) {
 					// When any are rejected, immediately reject this promise
-					myself.waitingFor -= 1;
-					myself.debugMessage('(when rejected) ' + myself.waitingFor + ' left');
+					waitingFor -= 1;
+					myself.debugMessage('(when rejected) ' + waitingFor + ' left');
 					myself.reject(err);
 				});
 			}
 		});
 
 		// Ok, now we can check to see if we are waiting for things
-		if (!myself.waitingFor) {
+		if (!waitingFor) {
 			myself.debugMessage('(when) Immediately resolved - no dependencies');
-			myself.resolve();
+			myself.resolve(this.successResults);
 		}
 
 		return this;
@@ -427,27 +461,45 @@
 
 	/**
 	 * Easy way to make a new promise based on the completion of other
-	 * promises.
+	 * promises.  Waits for all promises to be resolved, one way or another.
 	 *
-	 * Old:  var promise = new FidPromise([other, promises, go, here]);
+	 * Old:  var promise = new FidPromise();
+	 *       promise = promise.after([other, promises, go, here]);
 	 *       promise.then(...);
 	 *
-	 * New:  FidPromise.when([other, promises, go, here]).then(...);
+	 * New:  FidPromise.after([other, promises, go, here]).then(...);
 	 *
-	 * @param mixed (see constructor)
+	 * @param Array promises
 	 */
-	Promise.when = function () {
+	FidPromise.after = function (promises) {
 		var promise;
 
-		promise = new Promise();
-
-		if (arguments.length) {
-			promise.when.apply(promise, arguments);
-		}
-
+		promise = new FidPromise();
+		promise.after.call(promise, promises);
 		return promise;
 	};
 
 
-	return Promise;
+	/**
+	 * Easy way to make a new promise based on the completion of other
+	 * promises.  Waits for all promises to pass or any failure.
+	 *
+	 * Old:  var promise = new FidPromise();
+	 *       promise.when([other, promises, go, here]);
+	 *       promise.then(...);
+	 *
+	 * New:  FidPromise.when([other, promises, go, here]).then(...);
+	 *
+	 * @param Array promises
+	 */
+	FidPromise.when = function (promises) {
+		var promise;
+
+		promise = new FidPromise();
+		promise.when.call(promise, promises);
+		return promise;
+	};
+
+
+	return FidPromise;
 }));
