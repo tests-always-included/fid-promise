@@ -219,10 +219,6 @@
 	 */
 	FidPromise.prototype.chain = function (chainedPromise, wasSuccess, args) {
 		if (!chainedPromise) {
-			if (!wasSuccess) {
-				throw args[0];
-			}
-
 			return;
 		}
 
