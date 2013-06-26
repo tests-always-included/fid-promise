@@ -40,6 +40,17 @@
 
 
 	/**
+	 * Copy the arguments passed in
+	 *
+	 * @param arguments args
+	 * @return Array
+	 */
+	function copyArgs(args) {
+		return Array.prototype.slice.call(args);
+	}
+
+
+	/**
 	 * Determines if something is "thenable" according to A+ spec
 	 *
 	 * @param mixed target
@@ -116,7 +127,7 @@
 	FidPromise.prototype.after = function (promises) {
 		var args, endSuccess, failResults, myself, successResults, waitingFor;
 
-		args = Array.prototype.slice.call(arguments);
+		args = copyArgs(arguments);
 		waitingFor = 0;
 		endSuccess = true;
 		successResults = [];
@@ -247,9 +258,9 @@
 		try {
 			// Pass all arguments to the next promise
 			thenable.then(function () {
-				chainedPromise.complete(true, arguments);
+				chainedPromise.complete(true, copyArgs(arguments));
 			}, function () {
-				chainedPromise.complete(false, arguments);
+				chainedPromise.complete(false, copyArgs(arguments));
 			});
 		} catch (ex) {
 			chainedPromise.complete(false, [ ex ]);
@@ -357,7 +368,7 @@
 	 * @return this
 	 */
 	FidPromise.prototype.reject = function () {
-		return this.complete(false, arguments);
+		return this.complete(false, copyArgs(arguments));
 	};
 
 
@@ -368,7 +379,7 @@
 	 * @return this
 	 */
 	FidPromise.prototype.resolve = function () {
-		return this.complete(true, arguments);
+		return this.complete(true, copyArgs(arguments));
 	};
 
 
