@@ -1,16 +1,16 @@
 {
 	"name": "fid-promise",
-	"version": "1.1.2",
+	"version": "1.1.3",
 	"author": "Tyler Akins <fidian@rumkin.com>",
 	"description": "Promise/A+ compatible promises that are written to be easy to read, debuggable, tested and won't break your call stack.",
-	"homepage": "https://github.com/fidian/FidPromise",
+	"homepage": "https://github.com/fidian/fid-promise",
 	"contributors": [
 		"Tyler Akins <fidian@rumkin.com> (http://rumkin.com)"
 	],
 	"main": "./fid-promise.js",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/fidian/FidPromise.git"
+		"url": "https://github.com/fidian/fid-promise.git"
 	},
 	"keywords": [
 		"promise",
