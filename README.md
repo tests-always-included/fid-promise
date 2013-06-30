@@ -3,10 +3,7 @@ FidPromise
 
 [Promise/A+ specification] compliant promises.
 
-<a href="http://promises-aplus.github.com/promises-spec">
-<img src="http://promises-aplus.github.com/promises-spec/assets/logo-small.png"
-alt="Promises/A+ logo" title="Promises/A+ 1.0 compliant" align="right" />
-</a>
+[![Build Status](https://secure.travis-ci.org/fidian/fid-umd.png)](http://travis-ci.org/fidian/fid-umd) [![Promises/A+ 1.0 compliant](http://promises-aplus.github.com/promises-spec/assets/logo-small.png)](http://promises-aplus.github.com/promises-spec)
 
 Goals
 -----
@@ -116,6 +113,8 @@ Extra modules are needed when you run tests.  You need to have an environment th
 
     npm update
 	npm test
+	
+The code is also tested with [Travis CI](https://travis-ci.org/fidian/fid-umd) automatically.
 
 Changelog
 ---------
