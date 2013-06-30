@@ -18,8 +18,9 @@
 		"promises-aplus"
 	],
 	"devDependencies": {
-		"promises-aplus-tests": "*",
-		"mocha": "*"
+		"fid-umd": "*",
+		"mocha": "*",
+		"promises-aplus-tests": "*"
 	},
 	"license": "MIT",
 	"engines": {
@@ -27,6 +28,7 @@
 		"npm": ">=1"
 	},
 	"scripts": {
-		"test": "mocha"
+		"test": "mocha",
+		"umd": "fid-umd lib/fid-promise.js"
 	}
 }
