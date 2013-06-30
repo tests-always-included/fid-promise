@@ -17,7 +17,7 @@ Goals
 
 That last goal just means that everything runs with its own timeout, so one can not possibly break the code by accidentally chaining a lot of promises together.  If they are all synchronous and fulfill themselves immediately other libraries may recurse too deeply and cause the code to fail.  It's a tiny bit slower, but I'd take reliability over extreme speed.
 
-The module uses [UMD] (Universal Module Definition) to let you use this library in the following areas:
+The module uses [FidUmd](http://github.com/fidian/fid-umd) to let you use this library in the following areas:
 
 * In the browser, attaching to `window.FidPromise`
 * With YUI as FidPromise
