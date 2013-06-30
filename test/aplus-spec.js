@@ -6,7 +6,7 @@
 
 var adapter, Promise;
 
-Promise = require('../fid-promise');
+Promise = require('../lib/fid-promise');
 adapter = {
 	pending: function () {
 		var p = new Promise();

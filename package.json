@@ -7,7 +7,7 @@
 	"contributors": [
 		"Tyler Akins <fidian@rumkin.com> (http://rumkin.com)"
 	],
-	"main": "./fid-promise.js",
+	"main": "lib/fid-promise.js",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/fidian/fid-promise.git"

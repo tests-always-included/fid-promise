@@ -12,7 +12,7 @@
 var Assert, FidPromise;
 
 Assert = require('assert');
-FidPromise = require('../fid-promise.js');
+FidPromise = require('../lib/fid-promise.js');
 
 function FakePromise() {
 	this.a = 'unchanged';
