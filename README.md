@@ -54,7 +54,7 @@ Returns a new `FidPromise`.
 
 ### `promise.after(arrayOfPromises)`
 
-Waits for every promise in the array to be completed.  Once they are, this promise will be rejected or resolved.  If rejected, the passed data will be an array of all of the rejections.  If resolved properly, the passed data will be an array of all of the resolutions.  This is similar to `when()` except that this will reject the promise only after everything is done instead of on the first error.
+Waits for every promise in the array to be completed.  Once they are, this promise will be rejected or resolved.  If rejected, the passed data will be an array of all of the rejections.  If resolved properly, the passed data will be an array of all of the resolutions in the order they were passed in.  This is similar to `when()` except that this will reject the promise only after everything is done instead of on the first error.
 
 Returns `promise`.
 
