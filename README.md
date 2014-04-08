@@ -3,7 +3,7 @@ FidPromise
 
 [Promise/A+ specification] compliant promises.
 
-[![Build Status](https://secure.travis-ci.org/fidian/fid-umd.png)](http://travis-ci.org/fidian/fid-umd) [![Promises/A+ 1.0 compliant](http://promises-aplus.github.com/promises-spec/assets/logo-small.png)](http://promises-aplus.github.com/promises-spec)
+[![Build Status](https://secure.travis-ci.org/tests-always-included/fid-promise.png)](http://travis-ci.org/tests-always-included/fid-promise) [![Promises/A+ 1.0 compliant](http://promises-aplus.github.com/promises-spec/assets/logo-small.png)](http://promises-aplus.github.com/promises-spec)
 
 
 Goals
