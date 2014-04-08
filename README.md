@@ -130,6 +130,7 @@ Not all minor changes are listed here.  Just the important ones that affect how 
 
  * Rewrote large chunks of the library to handle the new Promise/A+ spec.
  * Hidden several functions inside the library; no more exposing things that should not be seen by a client.
+ * Moved the repository to the tests-always-included organization on GitHub.
 
 2013-05-30:
 
