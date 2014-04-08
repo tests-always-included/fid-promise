@@ -15,17 +15,12 @@ Assert = require('assert');
 FidPromise = require('../lib/fid-promise.js');
 
 function FakePromise() {
-	this.a = 'unchanged';
-	this.b = 'unchanged';
+    this.thenCallArray = [];
 }
 
-FakePromise.prototype.addCallbacks = function (a, b) {
-	this.a = a;
-	this.b = b;
-	return this;
-};
-
-function noop() {}
+function noop() {
+    return;
+}
 
 describe('FidPromise()', function () {
 	it('works without arguments', function () {
@@ -175,114 +170,40 @@ describe('FidPromise.prototype.after()', function () {
 });
 
 describe('FidPromise.prototype.always()', function () {
-	it('adds callsbacks correctly', function () {
+	it('adds callbacks correctly', function () {
 		var faker, result;
 
 		faker = new FakePromise();
 		result = FidPromise.prototype.always.call(faker, noop);
-		Assert.equal(faker.a, noop);
-		Assert.equal(faker.b, noop);
+        Assert.equal(faker.thenCallArray[0].onSuccess, noop);
+        Assert.equal(faker.thenCallArray[0].onError, noop);
+        Assert.equal(faker.thenCallArray[0].nextPromise, undefined);
 		Assert.strictEqual(faker, result);
-	});
-});
-
-describe('FidPromise.prototype.debugMessage()', function () {
-	var logger, logCount;
-
-	beforeEach(function () {
-		logger = console.log;
-		console.log = function () {
-			logCount += 1;
-		};
-		logCount = 0;
-	});
-	afterEach(function () {
-		console.log = logger;
-
-		if (FidPromise.debug) {
-			delete FidPromise.debug;
-		}
-	});
-	it('does not log when off', function () {
-		var p;
-		p = new FidPromise();
-		Assert.equal(0, logCount);
-	});
-	it('logs when Promise.debug = true', function () {
-		var p;
-		FidPromise.debug = true;
-		p = new FidPromise();
-		Assert.notEqual(0, logCount);
-	});
-	it('logs when promise.debug = true', function () {
-		var p;
-		p = new FidPromise();
-		Assert.equal(0, logCount);
-		p.debug = true;
-		p.then(noop);
-		Assert.notEqual(0, logCount);
-	});
-	it('logs when Promise.debug = function', function () {
-		var p, internalLogCount;
-		internalLogCount = 0;
-		FidPromise.debug = function () {
-			internalLogCount += 1;
-		};
-		p = new FidPromise();
-		Assert.equal(0, logCount);
-		Assert.notEqual(0, internalLogCount);
-	});
-	it('logs when promise.debug = function', function () {
-		var p, internalLogCount;
-		internalLogCount = 0;
-		p = new FidPromise();
-		p.debug = function () {
-			internalLogCount += 1;
-		};
-		p.then(noop);
-		Assert.equal(0, logCount);
-		Assert.notEqual(0, internalLogCount);
 	});
 });
 
 describe('FidPromise.prototype.error()', function () {
-	it('adds callsbacks correctly', function () {
+	it('adds callbacks correctly', function () {
 		var faker, result;
 
 		faker = new FakePromise();
 		result = FidPromise.prototype.error.call(faker, noop);
-		Assert.equal(faker.a, null);  // Not "unchanged"
-		Assert.equal(faker.b, noop);
+        Assert.equal(faker.thenCallArray[0].onSuccess, null);
+        Assert.equal(faker.thenCallArray[0].onError, noop);
+        Assert.equal(faker.thenCallArray[0].nextPromise, undefined);
 		Assert.strictEqual(faker, result);
 	});
 });
 
-describe('FidPromise.prototype.getId()', function () {
-	it('generates unique-ish IDs', function () {
-		var id1, id2;
-
-		function getId() {
-			var promise;
-			promise = new FidPromise();
-			return promise.getId();
-		}
-
-		id1 = getId();
-		id2 = getId();
-		Assert.notEqual(id1, id2);
-		Assert.equal(true, id1.length >= 10);
-		Assert.equal(true, id2.length >= 10);
-	});
-});
-
 describe('FidPromise.prototype.success()', function () {
-	it('adds callsbacks correctly', function () {
+	it('adds callbacks correctly', function () {
 		var faker, result;
 
 		faker = new FakePromise();
 		result = FidPromise.prototype.success.call(faker, noop);
-		Assert.equal(faker.a, noop);
-		Assert.equal(faker.b, null);  // Not "unchanged"
+        Assert.equal(faker.thenCallArray[0].onSuccess, noop);
+        Assert.equal(faker.thenCallArray[0].onError, undefined);
+        Assert.equal(faker.thenCallArray[0].nextPromise, undefined);
 		Assert.strictEqual(faker, result);
 	});
 });
@@ -435,7 +356,6 @@ describe('FidPromise.after()', function () {
 		FidPromise.prototype.after = oldAfter;
 	});
 	it('simply calls Promise.prototype.after()', function () {
-		var p;
 		FidPromise.after('pigs fly');
 		Assert.equal(1, afterCount);
 	});
@@ -456,7 +376,6 @@ describe('FidPromise.when()', function () {
 		FidPromise.prototype.when = oldWhen;
 	});
 	it('simply calls Promise.prototype.when()', function () {
-		var p;
 		FidPromise.when('pigs fly');
 		Assert.equal(1, whenCount);
 	});

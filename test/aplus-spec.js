@@ -8,11 +8,11 @@ var adapter, Promise;
 
 Promise = require('../lib/fid-promise');
 adapter = {
-	pending: function () {
+	deferred: function () {
 		var p = new Promise();
 		return {
 			promise: p,
-			fulfill: function (value) {
+			resolve: function (value) {
 				p.resolve(value);
 			},
 			reject: function (reason) {
