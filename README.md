@@ -5,6 +5,7 @@ FidPromise
 
 [![Build Status](https://secure.travis-ci.org/fidian/fid-umd.png)](http://travis-ci.org/fidian/fid-umd) [![Promises/A+ 1.0 compliant](http://promises-aplus.github.com/promises-spec/assets/logo-small.png)](http://promises-aplus.github.com/promises-spec)
 
+
 Goals
 -----
 
@@ -24,6 +25,7 @@ The module uses [FidUmd](http://github.com/fidian/fid-umd) to let you use this l
 * In node.js, AMD, CommonJS, and other methods via the regular module.exports
 * With RequireJS in the browser
 
+
 Quick Usage
 -----------
 
@@ -40,6 +42,7 @@ Quick Usage
     }, function (error) {
         console.log(':-(');
     });
+
 
 Public API
 ----------
@@ -106,6 +109,7 @@ Creates a new promise and calls `promise.after()` on it, passing in your argumen
 
 Creates a new promise and calls `promise.when()` on it, passing in your arguments.  Returns the new promise.  This saves you from potentially creating another local variable and could produce cleaner looking code.
 
+
 Running Tests
 -------------
 
@@ -116,10 +120,16 @@ Extra modules are needed when you run tests.  You need to have an environment th
 	
 The code is also tested with [Travis CI](https://travis-ci.org/fidian/fid-umd) automatically.
 
+
 Changelog
 ---------
 
 Not all minor changes are listed here.  Just the important ones that affect how you'd use this object.
+
+2014-04-08:
+
+ * Rewrote large chunks of the library to handle the new Promise/A+ spec.
+ * Hidden several functions inside the library; no more exposing things that should not be seen by a client.
 
 2013-05-30:
 
@@ -127,6 +137,7 @@ Not all minor changes are listed here.  Just the important ones that affect how 
  * `when()` will return an array of the results from the promises that are fulfilled.
  * `when()` now only accepts an array for a parameter.
  * Added `.after()` method and `FidPromise.after()` helper function.
+
 
 License
 -------
