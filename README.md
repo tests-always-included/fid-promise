@@ -139,6 +139,20 @@ Not all minor changes are listed here.  Just the important ones that affect how 
  * Added `.after()` method and `FidPromise.after()` helper function.
 
 
+Developing
+----------
+
+First, clone the repository.  Then run `npm install` to fetch dependencies.
+
+
+Testing
+-------
+
+Tests are *always* included.  You can run them with the following command.  It runs the test suites for both the Promise/A+ spec and custom unit tests.
+
+    npm test
+
+
 License
 -------
 
