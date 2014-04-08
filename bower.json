@@ -15,23 +15,13 @@
         "type": "git",
         "url": "https://github.com/tests-always-included/fid-promise.git"
     },
+    "files": [
+        "lib/fid-promise.js"
+    ],
     "keywords": [
         "promise",
         "a+",
         "promises-aplus"
     ],
-    "devDependencies": {
-        "fid-umd": ">=1.0.4",
-        "mocha": "*",
-        "promises-aplus-tests": "*"
-    },
-    "license": "MIT",
-    "engines": {
-        "node": ">=0.8",
-        "npm": ">=1.0"
-    },
-    "scripts": {
-        "test": "mocha",
-        "umd": "fid-umd lib/fid-promise.js"
-    }
+    "license": "MIT"
 }
