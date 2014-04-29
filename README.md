@@ -3,7 +3,7 @@ FidPromise
 
 [Promise/A+ specification] compliant promises.
 
-[![Build Status](https://secure.travis-ci.org/tests-always-included/fid-promise.png)](http://travis-ci.org/tests-always-included/fid-promise) [![Promises/A+ 1.0 compliant](http://promises-aplus.github.com/promises-spec/assets/logo-small.png)](http://promises-aplus.github.com/promises-spec)
+[![Build Status](https://secure.travis-ci.org/tests-always-included/fid-promise.png)](http://travis-ci.org/tests-always-included/fid-promise) [![Promises/A+ 1.0 compliant](http://promises-aplus.github.com/promises-spec/assets/logo-small.png)](http://promises-aplus.github.com/promises-spec) [![NPM](https://nodei.co/npm/fid-promise.png?downloads=true&stars=true)](https://npmjs.org/package/fid-promise)
 
 
 Goals
@@ -31,12 +31,12 @@ Quick Usage
 
     function somethingAsync() {
         promise = new FidPromise();
-        
+
         // Do something async and that will call promise.resolve(data) on
         // success, promise.reject(error) on failure
         return promise;
     }
-    
+
     somethingAsync().then(function (data) {
         console.log('Success!  :-)');
     }, function (error) {
@@ -117,7 +117,7 @@ Extra modules are needed when you run tests.  You need to have an environment th
 
     npm update
 	npm test
-	
+
 The code is also tested with [Travis CI](https://travis-ci.org/fidian/fid-umd) automatically.
 
 
