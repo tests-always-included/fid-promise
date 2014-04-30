@@ -3,7 +3,8 @@ FidPromise
 
 Promise/A+ compliant promises.  See the [Promises Spec] for more information.
 
-[![Build Status][travis-image]][Travis CI] [![Promises/A+ 1.1 compliant][promise-image]][Promises Spec] [![NPM][npm-image]][NPM] [![Dependencies][dependencies-image]][Dependencies] [![Dev Dependencies][devdependencies-image]][Dev Dependencies]
+[![Promises/A+ 1.1 compliant][promise-image]][Promises Spec] [![NPM][npm-image]][NPM]
+[![Build Status][travis-image]][Travis CI] [![Dependencies][dependencies-image]][Dependencies] [![Dev Dependencies][devdependencies-image]][Dev Dependencies]
 
 
 Goals
