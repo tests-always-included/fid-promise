@@ -1,9 +1,9 @@
 FidPromise
 ==========
 
-[Promise/A+ specification] compliant promises.
+Promise/A+ compliant promises.  See the [Promises Spec] for more information.
 
-[![Build Status](https://secure.travis-ci.org/tests-always-included/fid-promise.png)](http://travis-ci.org/tests-always-included/fid-promise) [![Promises/A+ 1.0 compliant](http://promises-aplus.github.com/promises-spec/assets/logo-small.png)](http://promises-aplus.github.com/promises-spec) [![NPM](https://nodei.co/npm/fid-promise.png?downloads=true&stars=true)](https://npmjs.org/package/fid-promise)
+[![Build Status][travis-image]][Travis CI] [![Promises/A+ 1.1 compliant][promise-image]][Promises Spec] [![NPM][npm-image]][NPM] [![Dependencies][dependencies-image]][Dependencies] [![Dev Dependencies][devdependencies-image]][Dev Dependencies]
 
 
 Goals
@@ -18,7 +18,7 @@ Goals
 
 That last goal just means that everything runs with its own timeout, so one can not possibly break the code by accidentally chaining a lot of promises together.  If they are all synchronous and fulfill themselves immediately other libraries may recurse too deeply and cause the code to fail.  It's a tiny bit slower, but I'd take reliability over extreme speed.
 
-The module uses [FidUmd](http://github.com/fidian/fid-umd) to let you use this library in the following areas:
+The module uses [FidUmd] to let you use this library in the following areas:
 
 * In the browser, attaching to `window.FidPromise`
 * With YUI as FidPromise
@@ -118,7 +118,7 @@ Extra modules are needed when you run tests.  You need to have an environment th
     npm update
 	npm test
 
-The code is also tested with [Travis CI](https://travis-ci.org/fidian/fid-umd) automatically.
+The code is also tested with [Travis CI] automatically.
 
 
 Changelog
@@ -159,6 +159,16 @@ License
 
 This package is licensed under the [MIT License] with an additional non-advertising clause.
 
+[Dev Dependencies]: https://david-dm.org/tests-always-included/fid-promise#info=devDependencies
+[devdependencies-image]: https://david-dm.org/tests-always-included/fid-promise/dev-status.png
+[Dependencies]: https://david-dm.org/tests-always-included/fid-promise
+[dependencies-image]: https://david-dm.org/tests-always-included/fid-promise.png
+[FidUmd]: https://github.com/fidian/fid-umd/
 [MIT License]: LICENSE.md
-[Promise/A+ specification]: https://github.com/promises-aplus/promises-spec
+[NPM]: https://npmjs.org/package/fid-promise
+[npm-image]: https://nodei.co/npm/fid-promise.png?downloads=true&stars=true
+[promise-image]: http://promises-aplus.github.com/promises-spec/assets/logo-small.png
+[Promises Spec]: https://github.com/promises-aplus/promises-spec
+[travis-image]: https://secure.travis-ci.org/tests-always-included/fid-promise.png
+[Travis CI]: http://travis-ci.org/tests-always-included/fid-promise
 [UMD]: https://github.com/umdjs/umd
