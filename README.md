@@ -173,6 +173,6 @@ This package is licensed under the [MIT License] with an additional non-advertis
 [npm-image]: https://nodei.co/npm/fid-promise.png?downloads=true&stars=true
 [promise-image]: http://promises-aplus.github.com/promises-spec/assets/logo-small.png
 [Promises Spec]: https://github.com/promises-aplus/promises-spec
-[travis-image]: https://secure.travis-ci.org/tests-always-included/fid-promise.png
+[travis-image]: https://secure.travis-ci.org/tests-always-included/fid-promise.png?branch=master
 [Travis CI]: http://travis-ci.org/tests-always-included/fid-promise
 [UMD]: https://github.com/umdjs/umd
