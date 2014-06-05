@@ -114,17 +114,6 @@ Creates a new promise and calls `promise.after()` on it, passing in your argumen
 Creates a new promise and calls `promise.when()` on it, passing in your arguments.  Returns the new promise.  This saves you from potentially creating another local variable and could produce cleaner looking code.
 
 
-Running Tests
--------------
-
-Extra modules are needed when you run tests.  You need to have an environment that uses node.js and npm.  From there, you should be able to just run these commands.
-
-    npm update
-	npm test
-
-The code is also tested with [Travis CI] automatically.
-
-
 Changelog
 ---------
 
