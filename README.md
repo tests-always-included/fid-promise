@@ -4,10 +4,10 @@ FidPromise
 Promise/A+ compliant promises.  See the [Promises Spec] for more information.
 
 [![Promises/A+ 1.1 compliant][promise-image]][Promises Spec]
-[![NPM][npm-image]][NPM]
-[![Build Status][travis-image]][Travis CI]
-[![Dependencies][dependencies-image]][Dependencies]
-[![Dev Dependencies][devdependencies-image]][Dev Dependencies]
+[![npm version][npm-badge]][npm-link]
+[![Build Status][travis-badge]][travis-link]
+[![Dependencies][dependencies-badge]][dependencies-link]
+[![Dev Dependencies][devdependencies-badge]][devdependencies-link]
 
 
 Goals
@@ -150,18 +150,19 @@ Tests are *always* included.  You can run them with the following command.  It r
 License
 -------
 
-This package is licensed under the [MIT License] with an additional non-advertising clause.
+This package is licensed under the [MIT License][LICENSE] with an additional non-advertising clause.
 
-[Dev Dependencies]: https://david-dm.org/tests-always-included/fid-promise#info=devDependencies
-[devdependencies-image]: https://david-dm.org/tests-always-included/fid-promise/dev-status.png
-[Dependencies]: https://david-dm.org/tests-always-included/fid-promise
-[dependencies-image]: https://david-dm.org/tests-always-included/fid-promise.png
+
+[dependencies-badge]: https://img.shields.io/david/fidian/fid-promise.svg
+[dependencies-link]: https://david-dm.org/fidian/fid-promise
+[devdependencies-badge]: https://img.shields.io/david/dev/fidian/fid-promise.svg
+[devdependencies-link]: https://david-dm.org/fidian/fid-promise#info=devDependencies
 [FidUmd]: https://github.com/fidian/fid-umd/
-[MIT License]: LICENSE.md
-[NPM]: https://npmjs.org/package/fid-promise
-[npm-image]: https://nodei.co/npm/fid-promise.png?downloads=true&stars=true
-[promise-image]: http://promises-aplus.github.com/promises-spec/assets/logo-small.png
+[LICENSE]: LICENSE.md
+[npm-badge]: https://img.shields.io/npm/v/fid-promise.svg
+[npm-link]: https://npmjs.org/package/fid-promise
+[promise-image]: https://promisesaplus.com/assets/logo-small.png
 [Promises Spec]: https://github.com/promises-aplus/promises-spec
-[travis-image]: https://secure.travis-ci.org/tests-always-included/fid-promise.png?branch=master
-[Travis CI]: http://travis-ci.org/tests-always-included/fid-promise
+[travis-badge]: https://img.shields.io/travis/fidian/fid-promise/master.svg
+[travis-link]: http://travis-ci.org/fidian/fid-promise
 [UMD]: https://github.com/umdjs/umd
