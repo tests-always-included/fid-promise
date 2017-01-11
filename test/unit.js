@@ -177,8 +177,8 @@ describe('FidPromise.prototype.always()', function () {
 		result = FidPromise.prototype.always.call(faker, noop);
         Assert.equal(faker.thenCallArray[0].onSuccess, noop);
         Assert.equal(faker.thenCallArray[0].onError, noop);
-        Assert.equal(faker.thenCallArray[0].nextPromise, undefined);
-		Assert.strictEqual(faker, result);
+        Assert.notEqual(faker.thenCallArray[0].nextPromise, undefined);
+		Assert.notStrictEqual(faker, result);
 	});
 });
 
@@ -190,8 +190,8 @@ describe('FidPromise.prototype.error()', function () {
 		result = FidPromise.prototype.error.call(faker, noop);
         Assert.equal(faker.thenCallArray[0].onSuccess, null);
         Assert.equal(faker.thenCallArray[0].onError, noop);
-        Assert.equal(faker.thenCallArray[0].nextPromise, undefined);
-		Assert.strictEqual(faker, result);
+        Assert.notEqual(faker.thenCallArray[0].nextPromise, undefined);
+		Assert.notStrictEqual(faker, result);
 	});
 });
 
@@ -203,8 +203,8 @@ describe('FidPromise.prototype.success()', function () {
 		result = FidPromise.prototype.success.call(faker, noop);
         Assert.equal(faker.thenCallArray[0].onSuccess, noop);
         Assert.equal(faker.thenCallArray[0].onError, undefined);
-        Assert.equal(faker.thenCallArray[0].nextPromise, undefined);
-		Assert.strictEqual(faker, result);
+        Assert.notEqual(faker.thenCallArray[0].nextPromise, undefined);
+		Assert.notStrictEqual(faker, result);
 	});
 });
 

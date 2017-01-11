@@ -67,7 +67,7 @@ Returns `promise`.
 
 ### `promise.always(callback)`
 
-Attach a callback to both the list of success and error callbacks.  The callback should always be called when the promise is completed.  Returns `promise`.
+Attach a callback to both the list of success and error callbacks.  The callback should always be called when the promise is completed.  Returns a new `FidPromise`.
 
 ### `FidPromise.debug` and `promise.debug`
 
@@ -77,7 +77,7 @@ You can also set `.debug` to a callback that will be passed a single string para
 
 ### `promise.error(onError)`
 
-Attach a callback to the list of error callbacks.  Returns `promise`.
+Attach a callback to the list of error callbacks.  Returns a new `FidPromise`.
 
 ### `promise.reject`
 
@@ -89,7 +89,7 @@ Complete this promise and call its success callbacks.  Returns `promise`.
 
 ### `promise.success(onSuccess)`
 
-Attach a callback to the list of success callbacks.  Returns `promise`.
+Attach a callback to the list of success callbacks.  Returns a new `FidPromise`.
 
 ### `promise.then(onSuccess, onError)`
 
@@ -97,13 +97,13 @@ Attach callbacks to the success and error callback lists.
 
 Both `onSuccess` and `onError` may be omitted or `null` for no callbacks, a function, or an array of functions.
 
-This always returns *a new FidPromise* object.
+This returns a new `FidPromise` object.
 
 ### `promise.when(arrayOfPromises)`
 
 Waits for every promise in the array to be resolved or until the first rejected promise.  If rejected, the promise will be immediately rejected with the data passed from the other rejected promise.  If resolved properly, the passed data will be an array of all of the resolutions.  This is the same as `after()` but this version does not wait for all of the promises to resolve if any hit an error condition.
 
-Returns `promise`.
+Returns a new `FidPromise`.
 
 ### `FidPromise.after(arrayOfPromises)`
 
@@ -118,6 +118,10 @@ Changelog
 ---------
 
 Not all minor changes are listed here.  Just the important ones that affect how you'd use this object.
+
+2017-01-11:
+
+ * Updated to newer A+ spec tests.
 
 2014-04-08:
 

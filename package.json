@@ -1,6 +1,6 @@
 {
     "name": "fid-promise",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "description": "Promise/A+ compatible promises that are writen to be easy to read, debuggable, tested and won't break your call stack.",
     "author": "Tyler Akins <fidian@rumkin.com>",
     "homepage": "https://github.com/tests-always-included/fid-promise",
